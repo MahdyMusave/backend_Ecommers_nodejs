@@ -17,9 +17,6 @@ const createUser = asyncHandler(async (req, res) => {
     throw new Error("User Already Exists");
   }
 });
-const findUser = async (req, res) => {
-  res.send("hello world");
-};
 const createlogin = asyncHandler(async (req, res) => {
   // console.log(req.body);
   const { email, password } = req.body;
@@ -39,4 +36,62 @@ const createlogin = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createUser, createlogin, findUser };
+//get all users
+const getAllUser = asyncHandler(async (req, res) => {
+  const findUsers = await User.find({});
+  // console.log(findUsers);
+  res.json(findUsers);
+});
+//get a single users
+const getSingleUser = asyncHandler(async (req, res) => {
+  // console.log(req.params);
+  try {
+    const findUser = await User.findOne({ _id: req.params.id });
+    // console.log(findUsers);
+    res.json(findUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const deleteUser = asyncHandler(async (req, res) => {
+  // console.log(req.params);
+  try {
+    const deleteUser = await User.deleteOne({ _id: req.params.id });
+    // console.log(findUsers);
+    res.json(deleteUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const updateUser = asyncHandler(async (req, res) => {
+  // console.log(req.params);
+  try {
+    //using in mongoDb---// const updateUser = await User.updateOne({ _id: req.params.id },{set:{firstname:'nima'}});
+    //using in mongoose
+    const {id}=req.params
+    const updateUser = await User.findByIdAndUpdate(
+      id,
+      {
+        firstname: req?.body?.firstname,
+        lastname: req?.body?.lastname,
+        email: req?.body?.eamil,
+      },
+      {
+        new: true,
+      }
+    );
+    // console.log(updateUser);
+    res.json(updateUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = {
+  createUser,
+  createlogin,
+  getAllUser,
+  getSingleUser,
+  deleteUser,
+  updateUser,
+};
