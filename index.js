@@ -5,6 +5,7 @@ const authRouter = require("./router/authRoute");
 const PORT = process.env.PORT || 4000;
 const db = require("./config/db_connection");
 const bodyParser = require("body-parser");
+const { notFound, errorHandler } = require("./middlewares/errorHandler");
 db();
 
 app.use(bodyParser.json());
@@ -15,6 +16,8 @@ app.use("/api/user", authRouter);
 // app.use("/", (req, res) => {
 //   res.send("hello from server");
 // });
+app.use(notFound);
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
 });
