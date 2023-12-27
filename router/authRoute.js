@@ -1,22 +1,33 @@
 const express = require("express");
 const router = express.Router();
-const { createUser } = require("../controller/userCtrl");
-const { createlogin } = require("../controller/userCtrl");
-const { getAllUser } = require("../controller/userCtrl");
-const { getSingleUser } = require("../controller/userCtrl");
-const { deleteUser } = require("../controller/userCtrl");
-const { updateUser } = require("../controller/userCtrl");
+const {
+  createUser,
+  createlogin,
+  getAllUser,
+  getSingleUser,
+  deleteUser,
+  updateUser,
+  blockedUser,
+  unblockUser,
+  handleRefreshToken,
+  logout,
+} = require("../controller/userCtrl");
 
+const { authMiddleware, isAdmin } = require("../middlewares/authmoiddleware");
 //route for post
 router.post("/register", createUser);
 router.post("/login", createlogin);
 
 //router for get
+router.get("/refresh", handleRefreshToken);
+router.get("/logout", logout);
 router.get("/all-users", getAllUser);
-router.get("/:id", getSingleUser);
+router.get("/:id", authMiddleware, isAdmin, getSingleUser);
 
 // router for delete
 router.delete("/:id", deleteUser);
 // router for delete
-router.put("/:id", updateUser);
+router.put("/edit-user", authMiddleware, updateUser);
+router.put("/block-user/:id", authMiddleware, isAdmin, blockedUser);
+router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockUser);
 module.exports = router;
