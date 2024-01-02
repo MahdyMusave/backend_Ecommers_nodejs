@@ -135,6 +135,7 @@ const updateUser = asyncHandler(async (req, res) => {
     //using in mongoose
     // const { id } = req.params;
     const { _id } = req.user;
+    // console.log(req.user);//when you create token
     validateMongoDbId(_id);
     const updateUser = await User.findByIdAndUpdate(
       _id,
@@ -190,6 +191,25 @@ const unblockUser = asyncHandler(async (req, res, next) => {
   }
 });
 
+const updatePassword = asyncHandler(async (req, res) => {
+  // console.log(req.user);
+  const { _id } = req.user;
+  const {password} = req.body;
+  validateMongoDbId(_id);
+  // console.log(req.body);
+  const user = await User.findById(_id);
+  // console.log(user);
+  // console.log(password, "password");
+  if (password) {
+    user.password = password;
+
+    const updatePassword = await user.save();
+    // console.log(updatePassword);
+    res.json(updatePassword);
+  } else {
+    res.json(user);
+  }
+});
 module.exports = {
   createUser,
   createlogin,
@@ -201,4 +221,5 @@ module.exports = {
   updateUser,
   blockedUser,
   unblockUser,
+  updatePassword,
 };
