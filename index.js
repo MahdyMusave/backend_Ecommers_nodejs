@@ -27,6 +27,6 @@ app.use("/api/blog", blog);
 // });
 app.use(notFound);
 app.use(errorHandler);
-app.listen(3001, () => {
+app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
 });
