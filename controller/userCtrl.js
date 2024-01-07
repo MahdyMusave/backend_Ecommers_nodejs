@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../utils/validateMongodbid");
 const { generateRefreshToken } = require("../config/refreshtoken");
 const JWT = require("jsonwebtoken");
+const sendEmail = require("./emailCtrl");
 
 const createUser = asyncHandler(async (req, res) => {
   // console.log(req.body);
@@ -194,7 +195,7 @@ const unblockUser = asyncHandler(async (req, res, next) => {
 const updatePassword = asyncHandler(async (req, res) => {
   // console.log(req.user);
   const { _id } = req.user;
-  const {password} = req.body;
+  const { password } = req.body;
   validateMongoDbId(_id);
   // console.log(req.body);
   const user = await User.findById(_id);
@@ -210,6 +211,24 @@ const updatePassword = asyncHandler(async (req, res) => {
     res.json(user);
   }
 });
+
+const forgotPasswordToken = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email: email });
+  // console.log(user);
+  if (!user) throw new Error("user not found with this email");
+
+  try {
+    // console.log(user);
+    const token = await user.createPasswordResetToken();
+    console.log(token);
+    await user.save();
+
+    res.json(token);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 module.exports = {
   createUser,
   createlogin,
@@ -222,4 +241,5 @@ module.exports = {
   blockedUser,
   unblockUser,
   updatePassword,
+  forgotPasswordToken,
 };
