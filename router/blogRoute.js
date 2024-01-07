@@ -8,6 +8,7 @@ const {
   updateBlog,
   deleteBlog,
   likeTheBlog,
+  disLikeTheBlog,
 } = require("../controller/blogCtrl");
 
 router.get("/", getAllBlog);
@@ -17,6 +18,8 @@ router.get("/:id", authMiddleware, isAdmin, getBlog);
 router.post("/", authMiddleware, isAdmin, createBlog);
 //route for likes
 router.put("/Likes", authMiddleware, likeTheBlog);
+router.put("/disLikes", authMiddleware, disLikeTheBlog);
+
 router.put("/:id", authMiddleware, isAdmin, updateBlog);
 router.delete("/:id", deleteBlog);
 
