@@ -73,12 +73,16 @@ const likeTheBlog = asyncHandler(async (req, res) => {
     // return console.log(isLiked);
 
     //find if the user has disliked the blog
-    const alreadyDisliked = blog?.likes?.find(
-      (userId = userId?.toString() === loginUserId?.toString())
+    const alreadyDisLiked = blog?.dislikes?.find(
+      (
+        userId /*{
+        return console.log(userId);
+      }*/
+      ) => userId?.toString() === loginUserId?.toString()
     );
 
-    if (alreadyDisliked) {
-      const blog = await Blog.findByIdAndDelete(
+    if (alreadyDisLiked) {
+      const findBlog = await Blog.findByIdAndUpdate(
         blogId,
         {
           $pull: { dislikes: loginUserId },
@@ -86,10 +90,10 @@ const likeTheBlog = asyncHandler(async (req, res) => {
         },
         { new: true }
       );
-      res.json(blog);
+      res.json(findBlog);
     }
     if (isLiked) {
-      const blog = await Blog.findByIdAndUpdate(
+      const findBlog = await Blog.findByIdAndUpdate(
         blogId,
         {
           $pull: { likes: loginUserId },
@@ -97,23 +101,90 @@ const likeTheBlog = asyncHandler(async (req, res) => {
         },
         { new: true }
       );
-      res.json(blog);
+      res.json(findBlog);
     } else {
-      const blog = await Blog.findByIdAndUpdate(
+      const findBlog = await Blog.findByIdAndUpdate(
         blogId,
         {
-          $push: { dislike: loginUserId },
-          isDisLike: true,
+          $push: { likes: loginUserId },
+          isLiked: true,
         },
         { new: true }
       );
-      res.json(blog);
+      res.json(findBlog);
     }
   } catch (err) {
     throw new Error(err);
   }
 });
-disLikeTheBlog = asyncHandler(async (req, res) => {});
+const disLikeTheBlog = asyncHandler(async (req, res) => {
+  try {
+    // return console.log(req.body);
+
+    const { blogId } = req.body;
+    validateMongoDbId(blogId);
+    // return console.log(blogId);
+
+    //Find the blog which you want to be liked
+    const blog = await Blog.findById(blogId);
+    // return console.log(blog);
+
+    //Find the login user
+    // return console.log(req.user);
+    const loginUserId = req?.user?._id;
+    // console.log(loginUserId);
+
+    //find if the user has liked the blog
+    const isDisLiked = blog?.isDisLiked;
+    // return console.log(isLiked);
+
+    //find if the user has disliked the blog
+    const alreadyDisLiked = blog?.likes?.find(
+      (
+        userId /*{
+        return console.log(userId);
+      }*/
+      ) => userId?.toString() === loginUserId?.toString()
+    );
+
+    if (alreadyDisLiked) {
+      const findBlog = await Blog.findByIdAndUpdate(
+        blogId,
+        {
+          $pull: { likes: loginUserId },
+          likes: false,
+        },
+        { new: true }
+      );
+      res.json(findBlog);
+    }
+    console.log(isDisLiked);
+    if (isDisLiked) {
+      const findBlog = await Blog.findByIdAndUpdate(
+        blogId,
+        {
+          $pull: { dislikes: loginUserId },
+          isDisLiked: false,
+        },
+        { new: true }
+      );
+      res.json(findBlog);
+    } else {
+      const findBlog = await Blog.findByIdAndUpdate(
+        blogId,
+        {
+          $push: { dislikes: loginUserId },
+          isDisLiked: true,
+        },
+        { new: true }
+      );
+      res.json(findBlog);
+    }
+  } catch (err) {
+    throw new Error(err);
+  }
+});
+
 module.exports = {
   createBlog,
   getAllBlog,

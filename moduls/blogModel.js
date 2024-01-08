@@ -22,18 +22,18 @@ const blogSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isDisLike: {
+    isDisLiked: {
       type: Boolean,
       default: false,
     },
-    likes: {
+    likes: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
-    },
-    dislike: {
+    }],
+    dislikes:[ {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
-    },
+    }],
     image: {
       type: String,
       default: "www.imageGoole.com/2334371",

@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const product = require("./router/productRoute");
 const blog = require("./router/blogRoute");
 const category = require("./router/categoryRoute");
+const brand = require("./router/brandRoute");
 const morgan = require("morgan");
 
 db();
@@ -23,12 +24,13 @@ app.use("/api/user", authRouter);
 app.use("/api/product", product);
 app.use("/api/blog", blog);
 app.use("/api/category", category);
+app.use("/api/brand", brand);
 
 // app.use("/", (req, res) => {
 //   res.send("hello from server");
 // });
 app.use(notFound);
 app.use(errorHandler);
-app.listen(3001, () => {
+app.listen(5000, () => {
   console.log(`server is running on port ${PORT}`);
 });
