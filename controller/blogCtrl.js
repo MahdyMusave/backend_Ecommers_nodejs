@@ -152,13 +152,13 @@ const disLikeTheBlog = asyncHandler(async (req, res) => {
         blogId,
         {
           $pull: { likes: loginUserId },
-          likes: false,
+          isLiked: false,
         },
         { new: true }
       );
       res.json(findBlog);
     }
-    console.log(isDisLiked);
+    // console.log(isDisLiked);
     if (isDisLiked) {
       const findBlog = await Blog.findByIdAndUpdate(
         blogId,
