@@ -17,7 +17,7 @@ router.get("/:id", authMiddleware, isAdmin, getBlog);
 
 router.post("/", authMiddleware, isAdmin, createBlog);
 //route for likes
-router.put("/Likes", authMiddleware, likeTheBlog);
+router.put("/likes", authMiddleware, likeTheBlog);
 router.put("/disLikes", authMiddleware, disLikeTheBlog);
 
 router.put("/:id", authMiddleware, isAdmin, updateBlog);
