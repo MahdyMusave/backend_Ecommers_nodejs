@@ -11,6 +11,7 @@ const product = require("./router/productRoute");
 const blog = require("./router/blogRoute");
 const category = require("./router/categoryRoute");
 const brand = require("./router/brandRoute");
+const blogCategory = require("./router/blogCatRoute");
 const morgan = require("morgan");
 
 db();
@@ -25,6 +26,7 @@ app.use("/api/product", product);
 app.use("/api/blog", blog);
 app.use("/api/category", category);
 app.use("/api/brand", brand);
+app.use("/api/blogCategory", blogCategory);
 
 // app.use("/", (req, res) => {
 //   res.send("hello from server");
