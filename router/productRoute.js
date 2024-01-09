@@ -6,11 +6,12 @@ const {
   getaProduct,
   updateProduct,
   deleteProduct,
+  addToWishList,
 } = require("../controller/productCtrl");
 
-const {authMiddleware, isAdmin } = require("../middlewares/authmoiddleware");
+const { authMiddleware, isAdmin } = require("../middlewares/authmoiddleware");
 //create new product with post;
-router.post("/",authMiddleware,isAdmin, createProduct);
+router.post("/", authMiddleware, isAdmin, createProduct);
 
 //get all products list
 router.get("/", getAllProduct);
@@ -19,8 +20,10 @@ router.get("/", getAllProduct);
 router.get("/:id", getaProduct);
 
 //update product by id
-router.put("/:id",authMiddleware,isAdmin, updateProduct);
+router.put("/wishlist", authMiddleware, addToWishList);
+router.put("/:id", authMiddleware, isAdmin, updateProduct);
 
 //delete product by id
-router.delete("/:id",authMiddleware,isAdmin, deleteProduct);
+router.delete("/:id", authMiddleware, isAdmin, deleteProduct);
+
 module.exports = router;

@@ -1,4 +1,4 @@
-const Category = require("../moduls/categoryModel");
+const BlogCategory = require("../moduls/blogCatModel");
 // const User = require("../moduls/userModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDbId = require("../utils/validateMongodbid");
@@ -6,7 +6,7 @@ const validateMongoDbId = require("../utils/validateMongodbid");
 
 const createCategory = asyncHandler(async (req, res) => {
   try {
-    const newCategory = await Category.create(req.body);
+    const newCategory = await BlogCategory.create(req.body);
     res.json(newCategory);
   } catch (error) {
     throw new Error(error);
@@ -14,14 +14,14 @@ const createCategory = asyncHandler(async (req, res) => {
 });
 
 const getAllCategory = asyncHandler(async (req, res) => {
-  const allCategory = await Category.find({});
+  const allCategory = await BlogCategory.find({});
   res.json(allCategory);
 });
 const getCategory = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
     // return console.log(id);
-    const category = await Category.findById({ _id: id });
+    const category = await BlogCategory.findById({ _id: id });
     res.json(category);
   } catch (error) {
     throw new Error(error);
@@ -32,7 +32,7 @@ const updateCategory = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
     // return console.log(id);
-    const updateCategory = await Category.findByIdAndUpdate(id, req.body, {
+    const updateCategory = await BlogCategory.findByIdAndUpdate(id, req.body, {
       new: true,
     });
     res.json(updateCategory);
@@ -44,7 +44,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 const deleteCategory = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteCategory = await Category.findByIdAndDelete({ _id: id });
+    const deleteCategory = await BlogCategory.findByIdAndDelete({ _id: id });
     res.json(deleteCategory);
   } catch (error) {
     throw new Error(error);
