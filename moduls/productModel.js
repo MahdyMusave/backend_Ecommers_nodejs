@@ -46,6 +46,7 @@ const ProductSchema = new mongoose.Schema(
       // enum: ["Black", "Brown", "Red"],
       require: true,
     },
+    
     ratings: [{
       star: Number,
       postedBy: {
