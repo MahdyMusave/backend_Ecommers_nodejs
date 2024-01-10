@@ -12,6 +12,7 @@ const blog = require("./router/blogRoute");
 const category = require("./router/categoryRoute");
 const brand = require("./router/brandRoute");
 const blogCategory = require("./router/blogCatRoute");
+const coupon = require("./router/couponRoute");
 const morgan = require("morgan");
 
 db();
@@ -27,12 +28,13 @@ app.use("/api/blog", blog);
 app.use("/api/category", category);
 app.use("/api/brand", brand);
 app.use("/api/blogCategory", blogCategory);
+app.use("/api/coupon", coupon);
 
 // app.use("/", (req, res) => {
 //   res.send("hello from server");
 // });
 app.use(notFound);
 app.use(errorHandler);
-app.listen(5000, () => {
+app.listen(6000, () => {
   console.log(`server is running on port ${PORT}`);
 });
