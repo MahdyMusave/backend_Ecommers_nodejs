@@ -3,6 +3,8 @@ const User = require("../moduls/userModel");
 const Product = require("../moduls/productModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
+const validateMongoDbId = require("../utils/validateMongodbid");
+const cloudinaryUploadImg = require("../utils/cloudinary");
 
 const createProduct = asyncHandler(async (req, res) => {
   try {
@@ -168,7 +170,7 @@ const rating = asyncHandler(async (req, res) => {
         },
         { new: true }
       );
-      console.log("updateRating", alreadyRated);
+      // console.log("updateRating", alreadyRated);
       res.json(updateRating);
     } else {
       const rateProduct = await Product.findByIdAndUpdate(
@@ -183,13 +185,70 @@ const rating = asyncHandler(async (req, res) => {
         },
         { new: true }
       );
-      console.log("rateProduct");
-      res.json(rateProduct);
+      // console.log("rateProduct");
+      // res.json(rateProduct);
     }
+
+    const getAllRating = await Product.findById(prodId);
+    // return console.log(getAllRating.ratings.length);
+    let totalRating = getAllProduct.ratings.length;
+    // return console.log(totalRating);
+    let ratingSum = getAllRating.ratings
+      .map((item) => item.star)
+      .reduce((prev, curr) => prev + curr, 0);
+    let actualRating = Math.random(ratingSum / totalRating);
+
+    const finalProduct = await Product.findByIdAndUpdate(
+      prodId,
+      {
+        totalrating: actualRating,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(finalProduct);
   } catch (error) {
     throw new Error(error);
   }
 });
+
+const uploadImage = asyncHandler(async (req, res) => {
+  // console.log(req.files);
+  const { id } = req.params;
+  validateMongoDbId(id);
+  try {
+    const uploader = (path) => cloudinaryUploadImg(path, "images");
+    // console.log(uploader());
+    const urls = [];
+    const files = req.files;
+    // console.log(files);
+    // return res.json(files);
+    for (const file of files) {
+      // return console.log(file.path);
+      const { path } = file;
+      // console.log(path);
+      const newpath = await uploader(path);
+      // console.log(newpath);
+      urls.push(newpath);
+    }
+    const findProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        images: urls.map((file) => {
+          return file;
+        }),
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(findProduct);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createProduct,
   getAllProduct,
@@ -198,4 +257,5 @@ module.exports = {
   deleteProduct,
   addToWishList,
   rating,
+  uploadImage,
 };
