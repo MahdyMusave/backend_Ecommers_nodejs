@@ -5,7 +5,7 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const validateMongoDbId = require("../utils/validateMongodbid");
 const cloudinaryUploadImg = require("../utils/cloudinary");
-
+const fs = require("fs");
 const createProduct = asyncHandler(async (req, res) => {
   try {
     // console.log(req.body);
@@ -231,6 +231,7 @@ const uploadImage = asyncHandler(async (req, res) => {
       const newpath = await uploader(path);
       // console.log(newpath);
       urls.push(newpath);
+      fs.unlinkSync(path)
     }
     const findProduct = await Product.findByIdAndUpdate(
       id,
