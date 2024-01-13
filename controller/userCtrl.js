@@ -263,6 +263,17 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
+getwishList = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const findUser = await User.findById(_id).populate('wishlist');
+    res.json(findUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createUser,
   createlogin,
@@ -277,4 +288,5 @@ module.exports = {
   updatePassword,
   forgotPasswordToken,
   createAdmin,
+  getwishList,
 };
