@@ -31,12 +31,9 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
-    address: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Address",
-      },
-    ],
+    address: {
+      type: String,
+    },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     refreshToken: {
       token: String,
@@ -61,13 +58,13 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
- userSchema.methods.createPasswordResetToken = async function () {
-   const resetToken = crypto.randomBytes(32).toString("hex");
-   this.passwordResetToken = crypto
-     .createHmac("sha256", process.env.JWT_SECRET)
-     .update(resetToken)
-     .digest("hex");
-   this.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 10 minutes
-   return resetToken;
- };
+userSchema.methods.createPasswordResetToken = async function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHmac("sha256", process.env.JWT_SECRET)
+    .update(resetToken)
+    .digest("hex");
+  this.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 10 minutes
+  return resetToken;
+};
 module.exports = mongoose.model("User", userSchema);

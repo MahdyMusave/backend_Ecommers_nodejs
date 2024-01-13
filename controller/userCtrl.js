@@ -132,6 +132,27 @@ const logout = asyncHandler(async (req, res) => {
   res.sendStatus(204);
 });
 
+//save user Address
+const saveAddress = asyncHandler(async (req, res, next) => {
+  const { _id } = req.user;
+  try {
+    validateMongoDbId(_id);
+    const updateUser = await User.findByIdAndUpdate(
+      _id,
+      {
+        address: req?.body?.address,
+      },
+      {
+        new: true,
+      }
+    );
+    // console.log(updateUser);
+    res.json(updateUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 //get all users
 const getAllUser = asyncHandler(async (req, res) => {
   const findUsers = await User.find({});
@@ -267,7 +288,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
 getwishList = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   try {
-    const findUser = await User.findById(_id).populate('wishlist');
+    const findUser = await User.findById(_id).populate("wishlist");
     res.json(findUser);
   } catch (error) {
     throw new Error(error);
@@ -289,4 +310,5 @@ module.exports = {
   forgotPasswordToken,
   createAdmin,
   getwishList,
+  saveAddress,
 };
