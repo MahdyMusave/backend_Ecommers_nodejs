@@ -6,6 +6,7 @@ const { generateRefreshToken } = require("../config/refreshtoken");
 const JWT = require("jsonwebtoken");
 const sendEmail = require("./emailCtrl");
 
+// login a user
 const createUser = asyncHandler(async (req, res) => {
   // console.log(req.body);
   const email = req.body.email;
@@ -48,6 +49,39 @@ const createlogin = asyncHandler(async (req, res) => {
       lastname: findUser?.lastname,
       email: findUser?.email,
       token: generateToken(findUser?._id),
+    });
+  } else {
+    throw new Error("user invalid");
+  }
+});
+//admin login
+const createAdmin = asyncHandler(async (req, res) => {
+  // console.log(req.body);
+  const { email, password } = req.body;
+  const findAdmin = await User.findOne({ email: email });
+  // console.log(findAdmin);
+  if (findAdmin.role !== "admin") throw new Error("Not Authorised");
+  if (findAdmin && (await findAdmin.isPasswordMatched(password))) {
+    const refreshToken = generateRefreshToken(findAdmin?._id);
+    const userupdate = await User.findByIdAndUpdate(
+      findAdmin._id,
+      {
+        refreshToken: refreshToken,
+      },
+      {
+        new: true,
+      }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000,
+    });
+    res.json({
+      _id: findAdmin?._id,
+      firstname: findAdmin?.firstname,
+      lastname: findAdmin?.lastname,
+      email: findAdmin?.email,
+      token: generateToken(findAdmin?._id),
     });
   } else {
     throw new Error("user invalid");
@@ -242,4 +276,5 @@ module.exports = {
   unblockUser,
   updatePassword,
   forgotPasswordToken,
+  createAdmin,
 };
