@@ -5,7 +5,9 @@ const validateMongoDbId = require("../utils/validateMongodbid");
 const { generateRefreshToken } = require("../config/refreshtoken");
 const JWT = require("jsonwebtoken");
 const sendEmail = require("./emailCtrl");
-
+const Cart = require("../moduls/cartModel");
+const Product = require("../moduls/productModel");
+const Coupon = require("../moduls/couponModel");
 // login a user
 const createUser = asyncHandler(async (req, res) => {
   // console.log(req.body);
@@ -295,6 +297,116 @@ getwishList = asyncHandler(async (req, res) => {
   }
 });
 
+const userCart = asyncHandler(async (req, res) => {
+  const { cart } = req.body;
+  const { _id } = req.user;
+  console.log(_id);
+
+  validateMongoDbId(_id);
+  try {
+    let products = [];
+    // check if user already have product in cart
+    const user = await User.findById(_id);
+    const alreadyExistCart = await Cart.findOne({ orderby: user._id });
+    if (alreadyExistCart) {
+      // console.log(alreadyExistCart);
+      alreadyExistCart.remove;
+    }
+    // return console.log(cart);
+    for (let i = 0; i < cart.length; i++) {
+      let object = {};
+      object.product = cart[i]._id;
+      object.count = cart[i].count;
+      object.color = cart[i].color;
+      let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+      object.price = getPrice.price;
+      products.push(object);
+    }
+
+    // console.log(products);
+    let cartTotal = 0;
+    // return console.log(products.length);
+    for (let i = 0; i < products.length; i++) {
+      // console.log(products[i]);
+      cartTotal = cartTotal + products[i].price * products[i].count;
+    }
+    // console.log(products, cartTotal);
+    let newCart = await new Cart({
+      products,
+      cartTotal,
+      orderby: user?._id,
+    }).save();
+    res.json(newCart);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getUserCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  try {
+    const cart = await Cart.findOne({ orderby: _id }).populate(
+      "products.product"
+    );
+    res.json(cart);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const emptyCart = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  // return console.log(req.user);
+  validateMongoDbId(_id);
+  try {
+    const user = await User.findOne({ _id });
+    // const cart = await Cart.findOneAndRemove();
+    const cart = await Cart.findOneAndDelete({ orderby: user._id });
+    res.json(cart);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const applyCoupon = asyncHandler(async (req, res) => {
+  const { coupon } = req.body;
+  // return console.log(coupon);
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  const validCoupon = await Coupon.findOne({ name: coupon });
+  // return console.log(validCoupon);
+  if (validCoupon == null) {
+    throw new Error("Invalid Coupon");
+  }
+  const user = await User.findOne({ _id });
+  let { cartTotal } = await Cart.findOne({
+    orderby: user._id,
+  }).populate("products.product");
+  // return console.log(cartTotal);
+  // return console.log(cartTotal * validCoupon.discount);
+  let totalAfterDiscount =
+    cartTotal - ((cartTotal * validCoupon.discount) / 100).toFixed(2);
+  // return console.log(user._id);
+  await Cart.findByIdAndUpdate(
+    { orderby: user._id },
+    { totalAfterDiscount },
+    { new: true }
+  );
+  res.json(totalAfterDiscount);
+});
+
+const createOrder = asyncHandler(async (req, res) => {
+  const { COD, couponApplied } = req.body;
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  try {
+    if (!COD) throw new Error("create cash order failed");
+    const user = await User.findById(_id);
+    let userCart = await Cart.findOne({orderby:user._id});
+  } catch (error) {
+    throw new Error(error);
+  }
+})
 module.exports = {
   createUser,
   createlogin,
@@ -311,4 +423,8 @@ module.exports = {
   createAdmin,
   getwishList,
   saveAddress,
+  userCart,
+  getUserCart,
+  emptyCart,
+  applyCoupon,
 };
